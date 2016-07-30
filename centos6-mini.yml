@@ -13,12 +13,12 @@
 
     lang: en_US.UTF-8
     keyboard: us
-    timezone: Asia/Jerusalem
+    timezone: Europe/Athens
     partition_size: 4096
 
     repos_list:
-      - { name: 'a-base', baseurl: 'http://mirror.isoc.org.il/pub/centos/6/os/$basearch' }
-      - { name: 'a-updates', baseurl: 'http://mirror.isoc.org.il/pub/centos/6/updates/$basearch' }
+      - { name: 'a-base', baseurl: 'http://mirror.centos.org/centos/6.8/os/$basearch' }
+      - { name: 'a-updates', baseurl: 'http://mirror.centos.org/centos/6.8/updates/$basearch' }
 
     # End of variable block used by generate_config.py
 
