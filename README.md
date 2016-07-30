@@ -13,7 +13,7 @@ Install EPEL repository if not already installed:
 
 Install required packages:
 
-    # yum -y install livecd-tools git ansible python-argparse screen
+    # yum -y install livecd-tools git ansible python-argparse screen python-jinja2
 
 Clone livecd-ansible repository:
 

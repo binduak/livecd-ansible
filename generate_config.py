@@ -10,7 +10,7 @@ cmdargs = str(sys.argv)
 config_file_name=str(sys.argv[1])
 
 template_folder='templates'
-default_template='centos6-mini.ks.j2'
+default_template='centos6-desktop.ks.j2'
 
 script_path, script_filename = os.path.split(os.path.abspath(__file__))
 template_folder=os.path.join(script_path,template_folder)
