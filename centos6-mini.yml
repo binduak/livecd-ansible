@@ -27,7 +27,8 @@
     # Add your ansible roles here
     # - epel-repo
     # - centos-sshd-service
-    - livecd-pxe-common
+    # Until here
+    # - livecd-pxe-common
     - livecd-post-common
 
 

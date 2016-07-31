@@ -117,6 +117,8 @@ fi
 
 
 ## fix various bugs and issues
+# unmute sound card
+exists alsaunmute 0 2> /dev/null
 
 # turn off firstboot for livecd boots
 echo "RUN_FIRSTBOOT=NO" > /etc/sysconfig/firstboot
@@ -164,6 +166,69 @@ sed -i -e 's/HOSTNAME=localhost.localdomain/HOSTNAME={{ hostname }}/g' /etc/sysc
 /usr/bin/passwd -d {{ livecd_user }} > /dev/null
 # give default user sudo privileges
 echo "{{ livecd_user }}     ALL=(ALL)     NOPASSWD: ALL" >> /etc/sudoers
+
+## configure default user's desktop
+# set up timed auto-login at 10 seconds
+cat >> /etc/gdm/custom.conf << FOE
+[daemon]
+TimedLoginEnable=true
+TimedLogin={{ livecd_user }}
+TimedLoginDelay=10
+FOE
+
+# add keyboard and display configuration utilities to the desktop
+mkdir -p /home/{{ livecd_user }}/Desktop >/dev/null
+cp /usr/share/applications/gnome-keyboard.desktop           /home/{{ livecd_user }}/Desktop/
+cp /usr/share/applications/gnome-display-properties.desktop /home/{{ livecd_user }}/Desktop/
+
+# disable screensaver locking
+gconftool-2 --direct --config-source=xml:readwrite:/etc/gconf/gconf.xml.defaults -s -t bool   /apps/gnome-screensaver/lock_enabled "false" >/dev/null
+
+# disable PackageKit update checking by default
+gconftool-2 --direct --config-source=xml:readwrite:/etc/gconf/gconf.xml.defaults -s -t int /apps/gnome-packagekit/update-icon/frequency_get_updates "0" >/dev/null
+
+# Switching to Thunderbird as the default MUA
+gconftool-2 --direct --config-source=xml:readwrite:/etc/gconf/gconf.xml.defaults --type string --set /desktop/gnome/url-handlers/mailto/command "thunderbird %" >/dev/null
+
+# Creating a file for anaconda, to create the correct grub entry
+echo -e "CentOS.$(uname -m)\nCentOS Linux\n6\nyes" > /.buildstamp
+
+# detecting disk partitions and logical volumes
+CreateDesktopIconHD()
+{
+cat > /home/$LIVECD_USER/Desktop/Local\ hard\ drives.desktop << EOF_HDicon
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Type=Link
+Name=Local hard drives
+Name[en_US]=Local hard drives
+Name[fr_CA]=Disques durs locaux
+URL=/mnt/disc
+Icon=/usr/share/icons/gnome/32x32/devices/gnome-dev-harddisk.png
+EOF_HDicon
+
+chmod 755 /home/{{ livecd_user }}/Desktop/Local\ hard\ drives.desktop
+}
+
+CreateDesktopIconLVM()
+{
+mkdir -p /home/{{ livecd_user }}/Desktop >/dev/null
+
+cat > /home/{{ livecd_user }}/Desktop/Local\ logical\ volumes.desktop << EOF_LVMicon
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Type=Link
+Name=Local logical volumes
+Name[en_US]=Local logical volumes
+Name[fr_CA]=Volumes logiques locaux
+URL=/mnt/lvm
+Icon=/usr/share/icons/gnome/32x32/devices/gnome-dev-harddisk.png
+EOF_LVMicon
+
+chmod 755 /home/{{ livecd_user }}/Desktop/Local\ logical\ volumes.desktop
+}
 
 # don't mount disk partitions if 'nodiskmount' is given as a boot option
 if ! strstr "`cat /proc/cmdline`" nodiskmount ; then

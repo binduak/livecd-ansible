@@ -31,14 +31,14 @@ for o in `cat /proc/cmdline` ; do
 done
 
 # if liveinst or textinst is given, start anaconda
-#if strstr "`cat /proc/cmdline`" liveinst ; then
-#   plymouth --quit
-#   /usr/sbin/liveinst $ks
-#fi
-#if strstr "`cat /proc/cmdline`" textinst ; then
-#   plymouth --quit
-#   /usr/sbin/liveinst --text $ks
-#fi
+if strstr "`cat /proc/cmdline`" liveinst ; then
+   plymouth --quit
+   /usr/sbin/liveinst $ks
+fi
+if strstr "`cat /proc/cmdline`" textinst ; then
+   plymouth --quit
+   /usr/sbin/liveinst --text $ks
+fi
 
 # configure X, allowing user to override xdriver
 if [ -n "\$xdriver" ]; then
@@ -46,4 +46,4 @@ if [ -n "\$xdriver" ]; then
 fi
 
 # Fix the "liveinst doesn't start in gui mode when not enough memory available" - switching to terminal mode
-# sed -i "s/Terminal=false/Terminal=true/" /home/$LIVECD_USER/Desktop/liveinst.desktop
+sed -i "s/Terminal=false/Terminal=true/" /home/{{ livecd_user }}/Desktop/liveinst.desktop
