@@ -1,0 +1,49 @@
+#!/bin/bash
+
+# Copy licensing information
+cp $INSTALL_ROOT/usr/share/doc/*-release-*/GPL $LIVE_ROOT/GPL
+
+# add livecd-iso-to-disk utility on the LiveCD
+# only works on x86, x86_64
+if [ "$(uname -i)" = "i386" -o "$(uname -i)" = "x86_64" ]; then
+  if [ ! -d {{ live_root }}/LiveOS ]; then mkdir -p {{ live_root }}/LiveOS ; fi
+  cp /usr/bin/livecd-iso-to-disk {{ live_root }}/LiveOS
+fi
+
+# customize boot menu entries
+grep -B4 'menu default'  {{ live_root }}/isolinux/isolinux.cfg > {{ live_root }}/isolinux/default.txt
+grep -B3 'xdriver=vesa'  {{ live_root }}/isolinux/isolinux.cfg > {{ live_root }}/isolinux/basicvideo.txt
+grep -A3 'label check0'  {{ live_root }}/isolinux/isolinux.cfg > {{ live_root }}/isolinux/check.txt
+grep -A2 'label memtest' {{ live_root }}/isolinux/isolinux.cfg > {{ live_root }}/isolinux/memtest.txt
+grep -A2 'label local'   {{ live_root }}/isolinux/isolinux.cfg > {{ live_root }}/isolinux/localboot.txt
+
+sed "s/label linux0/label linuxtext0/"   {{ live_root }}/isolinux/default.txt > {{ live_root }}/isolinux/textboot.txt
+sed -i "s/Boot/Boot (Text Mode)/"                                           {{ live_root }}/isolinux/textboot.txt
+sed -i "s/liveimg/liveimg 3/"                                               {{ live_root }}/isolinux/textboot.txt
+sed -i "/menu default/d"                                                    {{ live_root }}/isolinux/textboot.txt
+
+sed "s/label linux0/label install0/"     {{ live_root }}/isolinux/default.txt > {{ live_root }}/isolinux/install.txt
+sed -i "s/Boot/Install/"                                                    {{ live_root }}/isolinux/install.txt
+sed -i "s/liveimg/liveimg liveinst noswap nolvmmount/"                      {{ live_root }}/isolinux/install.txt
+sed -i "s/ quiet / /"                                                       {{ live_root }}/isolinux/install.txt
+sed -i "s/ rhgb / /"                                                        {{ live_root }}/isolinux/install.txt
+sed -i "/menu default/d"                                                    {{ live_root }}/isolinux/install.txt
+
+sed "s/label linux0/label textinstall0/" {{ live_root }}/isolinux/default.txt > {{ live_root }}/isolinux/textinstall.txt
+sed -i "s/Boot/Install (Text Mode)/"                                        {{ live_root }}/isolinux/textinstall.txt
+sed -i "s/liveimg/liveimg textinst noswap nolvmmount/"                      {{ live_root }}/isolinux/textinstall.txt
+sed -i "s/ quiet / /"                                                       {{ live_root }}/isolinux/textinstall.txt
+sed -i "s/ rhgb / /"                                                        {{ live_root }}/isolinux/textinstall.txt
+sed -i "/menu default/d"                                                    {{ live_root }}/isolinux/textinstall.txt
+
+cat {{ live_root }}/isolinux/default.txt {{ live_root }}/isolinux/basicvideo.txt {{ live_root }}/isolinux/check.txt {{ live_root }}/isolinux/memtest.txt {{ live_root }}/isolinux/localboot.txt > {{ live_root }}/isolinux/current.txt
+diff {{ live_root }}/isolinux/isolinux.cfg {{ live_root }}/isolinux/current.txt | sed '/^[0-9][0-9]*/d; s/^. //; /^---$/d' > {{ live_root }}/isolinux/cleaned.txt
+cat {{ live_root }}/isolinux/cleaned.txt {{ live_root }}/isolinux/default.txt {{ live_root }}/isolinux/textboot.txt {{ live_root }}/isolinux/basicvideo.txt {{ live_root }}/isolinux/install.txt {{ live_root }}/isolinux/textinstall.txt {{ live_root }}/isolinux/memtest.txt {{ live_root }}/isolinux/localboot.txt > {{ live_root }}/isolinux/isolinux.cfg
+rm -f {{ live_root }}/isolinux/*.txt
+
+# Forcing plymouth to show the logo in vesafb 
+#sed -i "s/rhgb/rhgb vga=791/g"	\$LIVE_ROOT/isolinux/isolinux.cfg
+
+# Disabling auto lvm/disk mount (that will crash the "Install to Hard Drive feature")
+sed -i "s/quiet/quiet nodiskmount nolvmmount/g"	{{ live_root }}/isolinux/isolinux.cfg
+

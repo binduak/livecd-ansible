@@ -1,7 +1,13 @@
-- name: Get CDLABEL from isolinux.cfg
-  shell: /bin/grep CDLABEL {{ live_root }}/isolinux/isolinux.cfg | /usr/bin/head -n1 | /bin/awk '{print $3}' | /bin/awk -F= '{print $3}'
-  register: cdlabel
-  changed_when: "cdlabel.rc != 0"
+- name: Deploy postnochroot-install
+  template: src=postnochroot-install.j2 dest={{ live_root }}/postnochroot-install owner=root group=root
 
-- name: Deploy modified isolinux.cfg
-  template: src=isolinux_isolinux.cfg.j2 dest={{ live_root }}/isolinux/isolinux.cfg owner=root group=root
+- name: Execute postnochroot-install
+  command: /bin/bash {{ live_root }}/postnochroot-install
+
+# - name: Get CDLABEL from isolinux.cfg
+#   shell: /bin/grep CDLABEL {{ live_root }}/isolinux/isolinux.cfg | /usr/bin/head -n1 | /bin/awk '{print $3}' | /bin/awk -F= '{print $3}'
+#   register: cdlabel
+#   changed_when: "cdlabel.rc != 0"
+
+# - name: Deploy modified isolinux.cfg
+#   template: src=isolinux_isolinux.cfg.j2 dest={{ live_root }}/isolinux/isolinux.cfg owner=root group=root
