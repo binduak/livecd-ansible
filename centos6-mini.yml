@@ -4,8 +4,8 @@
   gather_facts: false
 
   vars:
-    cdlabel: centos6-mini
-    hostname: centos6-mini
+    cdlabel: centos6-desktop
+    hostname: geonode
     livecd_user: centos
     root_password: centos
 
