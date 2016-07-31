@@ -5,7 +5,7 @@
 
   vars:
     cdlabel: centos6-desktop
-    hostname: geonode
+    hostname: centos6-desktop
     livecd_user: centos
     root_password: centos
 
