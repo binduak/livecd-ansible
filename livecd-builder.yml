@@ -13,7 +13,7 @@
     #livecd_ansible_src_path: /opt/livecd-ansible
     livecd_ansible_src_path: /vagrant
 
-    livecd_label: centos6-mini
+    livecd_label: centos6-desktop
 
     # Upload tasks to tftp and iso server are done in "naive" way.
     # It is expected that livecd-builder server has root ssh keys for both servers.
