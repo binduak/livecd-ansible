@@ -1,0 +1,37 @@
+# Run from agent
+- name : Remove jre
+  yum: name=jre state=absent
+
+- name: Deleting temporal files
+  file:
+    path=/etc/bahmni-installer
+    state=absent
+  ignore_errors: true
+
+- name: Remove bahmni-installer
+  yum: name=bahmni-installer state=absent
+
+- name: Install bahmni-installer rpm
+  yum: name={{ bahmni_installer_url }} state=present
+
+- name: Get setup.yml from remote location if configured
+  get_url: url={{ setup_yml_url }}
+   force=yes
+   dest=/etc/bahmni-installer/setup.yml
+   mode=0644
+  when: setup_yml_url is defined
+  tags: vault
+
+- name: Get inventory from remote location if configured
+  get_url: url={{ inv_url }}
+   force=yes
+   dest=/etc/bahmni-installer/inventory
+   mode=0644
+  when: inv_url is defined
+  tags: vault
+
+- name: Run bahmni installer
+  shell: "bahmni -i inventory install"
+
+- name: Stop Bahmni Services
+  shell: "bahmni -i inventory stop"  

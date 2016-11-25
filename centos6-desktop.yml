@@ -25,8 +25,9 @@
   roles:
     - livecd-pre-common
     # Add your ansible roles here
-    # - epel-repo
-    # - centos-sshd-service
+     - epel-repo
+     - centos-sshd-service
+     - bahmni-deploy
     # Until here
     # - livecd-pxe-common
     - livecd-post-common
